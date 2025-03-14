@@ -5,11 +5,20 @@ function get_sub_info {
   local domain=$1
   local subdomain=$2
   local full_domain="${subdomain}.${domain}"
-  local record_info=$(dig +noall +answer ${full_domain} | awk '{print $4, $5}')
-  local record_type=$(echo $record_info | awk '{print $1}')
-  local record_ip=$(echo $record_info | awk '{print $2}')
+  echo "Checking ${full_domain}..."
+  
+  # Capture the IP address using dig
+  local record_ip=$(dig +short ${full_domain})
 
-  echo "The subdomain ${subdomain} is a ${record_type} record and points to ${record_ip}"
+  # Print the raw result for debugging
+  echo "dig +short ${full_domain}: ${record_ip}"
+
+  if [[ -z "$record_ip" ]]; then
+    echo "No IP address found for ${full_domain}"
+    return
+  fi
+
+  echo "The subdomain ${subdomain} is a A record and points to ${record_ip}"
 }
 
 domain=$1
